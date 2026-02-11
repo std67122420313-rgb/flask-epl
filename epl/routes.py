@@ -89,8 +89,11 @@ def new_player():
     img = request.form['img']
     club_id = int(request.form['club_id'])
 
+    raw_cs = request.form.get('clean_sheets')
+    clean_sheets = int(raw_cs) if raw_cs and position == 'Goalkeeper' else None
+
     player = Player(name=name, position=position, nationality=nationality,
-                    goals=goals, squad_no=squad_no, img=img, club_id=club_id)
+                    goals=goals, squad_no=squad_no, img=img, club_id=club_id,  clean_sheets=  clean_sheets)
     db.session.add(player)
     db.session.commit()
     flash('add new player successfully', 'success')
