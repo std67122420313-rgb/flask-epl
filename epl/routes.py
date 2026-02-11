@@ -4,110 +4,147 @@ from flask import redirect, render_template, url_for, flash, request
 
 @app.route('/')
 def index():
-  return render_template('index.html', title='Home Page')
+    return render_template('index.html', title='Home Page')
+
+# --- SECTION: CLUBS ---
 
 @app.route('/clubs')
 def all_clubs():
-  clubs = db.session.scalars(db.select(Club)).all()
-  return render_template('clubs/index.html',
-                         title='Clubs Page',
-                         clubs=clubs)
+    clubs = db.session.scalars(db.select(Club)).all()
+    return render_template('clubs/index.html',
+                           title='Clubs Page',
+                           clubs=clubs)
 
 @app.route('/clubs/new', methods=['GET', 'POST'])
 def new_club():
-  if request.method == 'POST':
-    name = request.form['name']
-    stadium = request.form['stadium']
-    year = int(request.form['year'])
-    logo = request.form['logo']
+    if request.method == 'POST':
+        name = request.form['name']
+        stadium = request.form['stadium']
+        year = int(request.form['year'])
+        logo = request.form['logo']
 
-    club = Club(name=name, stadium=stadium, year=year, logo=logo)
-    db.session.add(club)
-    db.session.commit()
-    flash('add new club successfully', 'success')
-    return redirect(url_for('all_clubs'))
-  
-  return render_template('clubs/new_club.html',
-                         title='New Club Page')
+        club = Club(name=name, stadium=stadium, year=year, logo=logo)
+        db.session.add(club)
+        db.session.commit()
+        flash('add new club successfully', 'success')
+        return redirect(url_for('all_clubs'))
+    
+    return render_template('clubs/new_club.html',
+                           title='New Club Page')
 
 @app.route('/clubs/search', methods=['GET', 'POST'])
 def search_club():
-  if request.method == 'POST':
-    club_name = request.form['club_name']
-    clubs = db.session.scalars(db.select(Club).where(Club.name.like(f'%{club_name}%'))).all()
-    return render_template('clubs/search_club.html',
-                          title='Search Club Page',
-                          clubs=clubs)
+    if request.method == 'POST':
+        club_name = request.form['club_name']
+        clubs = db.session.scalars(db.select(Club).where(Club.name.like(f'%{club_name}%'))).all()
+        return render_template('clubs/search_club.html',
+                              title='Search Club Page',
+                              clubs=clubs)
   
 @app.route('/clubs/<int:id>/info')
 def info_club(id):
-  club = db.session.get(Club, id)
-  return render_template('clubs/info_club.html',
-                         title='Info Club Page',
-                         club=club)
+    club = db.session.get(Club, id)
+    return render_template('clubs/info_club.html',
+                           title='Info Club Page',
+                           club=club)
 
 @app.route('/clubs/<int:id>/update', methods=['GET','POST'])
 def update_club(id):
-  club = db.session.get(Club, id)
-  if request.method == 'POST':
-    name = request.form['name']
-    stadium = request.form['stadium']
-    year = int(request.form['year'])
-    logo = request.form['logo']
+    club = db.session.get(Club, id)
+    if request.method == 'POST':
+        name = request.form['name']
+        stadium = request.form['stadium']
+        year = int(request.form['year'])
+        logo = request.form['logo']
 
-    club.name = name
-    club.stadium = stadium
-    club.year = year
-    club.logo = logo
+        club.name = name
+        club.stadium = stadium
+        club.year = year
+        club.logo = logo
 
-    db.session.add(club)
-    db.session.commit()
+        db.session.commit()
+        flash('update club successfully', 'success')
+        return redirect(url_for('all_clubs'))
+    
+    return render_template('clubs/update_club.html',
+                           title='Update Club Page',
+                           club=club)
 
-    flash('update club successfully', 'success')
-    return redirect(url_for('all_clubs'))
-  
-  return render_template('clubs/update_club.html',
-                         title='Update Club Page',
-                         club=club)
+# --- SECTION: PLAYERS ---
 
 @app.route('/players')
 def all_players():
-  players = db.session.scalars(db.select(Player)).all()
-  return render_template('players/index.html',
-                         title='Players Page',
-                         players=players)
+    players = db.session.scalars(db.select(Player)).all()
+    return render_template('players/index.html',
+                           title='Players Page',
+                           players=players)
 
 @app.route('/players/new', methods=['GET', 'POST'])
 def new_player():
-  clubs = db.session.scalars(db.select(Club)).all()
-  if request.method == 'POST':
-    name = request.form['name']
-    position = request.form['position']
-    nationality = request.form['nationality']
-    goals = int(request.form['goals'])
-    squad_no = int(request.form['squad_no'])
-    img = request.form['img']
-    club_id = int(request.form['club_id'])
+    clubs = db.session.scalars(db.select(Club)).all()
+    if request.method == 'POST':
+        name = request.form['name']
+        position = request.form['position']
+        nationality = request.form['nationality']
+        goals = int(request.form['goals'])
+        squad_no = int(request.form['squad_no'])
+        img = request.form['img']
+        club_id = int(request.form['club_id'])
 
-    raw_cs = request.form.get('clean_sheets')
-    clean_sheets = int(raw_cs) if raw_cs and position == 'Goalkeeper' else None
+        raw_cs = request.form.get('clean_sheets')
+        clean_sheets = int(raw_cs) if raw_cs and position == 'Goalkeeper' else None
 
-    player = Player(name=name, position=position, nationality=nationality,
-                    goals=goals, squad_no=squad_no, img=img, club_id=club_id,  clean_sheets=  clean_sheets)
-    db.session.add(player)
-    db.session.commit()
-    flash('add new player successfully', 'success')
-    return redirect(url_for('all_players'))
+        player = Player(name=name, position=position, nationality=nationality,
+                        goals=goals, squad_no=squad_no, img=img, club_id=club_id, clean_sheets=clean_sheets)
+        db.session.add(player)
+        db.session.commit()
+        flash('add new player successfully', 'success')
+        return redirect(url_for('all_players'))
 
-  return render_template('players/new_player.html',
-                         title='New Player Page',
-                         clubs=clubs)
+    return render_template('players/new_player.html',
+                           title='New Player Page',
+                           clubs=clubs)
 
 @app.route('/players/search', methods=['POST'])
 def search_player():
-  if request.method == 'POST':
-    player_name = request.form['player_name']
-    players = db.session.scalars(db.select(Player).where(Player.name.like(f'%{player_name}%'))).all()
-    return render_template('players/search_player.html',
-                           title='Search Player Page',
-                           players=players)
+    if request.method == 'POST':
+        player_name = request.form['player_name']
+        players = db.session.scalars(db.select(Player).where(Player.name.like(f'%{player_name}%'))).all()
+        return render_template('players/search_player.html',
+                               title='Search Player Page',
+                               players=players)
+
+# เพิ่มฟังก์ชัน info_player สำหรับแสดงข้อมูลนักเตะ
+@app.route('/players/<int:id>/info')
+def info_player(id):
+    player = db.session.get(Player, id)
+    return render_template('players/info_player.html', 
+                           title='Info Player Page', 
+                           player=player)
+
+# เพิ่มฟังก์ชัน update_player สำหรับแก้ไขข้อมูลนักเตะ
+@app.route('/players/<int:id>/update', methods=['GET', 'POST'])
+def update_player(id):
+    player = db.session.get(Player, id)
+    clubs = db.session.scalars(db.select(Club)).all()
+    
+    if request.method == 'POST':
+        player.name = request.form['name']
+        player.position = request.form['position']
+        player.nationality = request.form['nationality']
+        player.goals = int(request.form['goals'])
+        player.squad_no = int(request.form['squad_no'])
+        player.img = request.form['img']
+        player.club_id = int(request.form['club_id'])
+        
+        raw_cs = request.form.get('clean_sheets')
+        player.clean_sheets = int(raw_cs) if raw_cs and player.position == 'Goalkeeper' else None
+
+        db.session.commit()
+        flash('Update player successfully', 'success')
+        return redirect(url_for('all_players'))
+
+    return render_template('players/update_player.html', 
+                           title='Update Player Page', 
+                           player=player, 
+                           clubs=clubs)
