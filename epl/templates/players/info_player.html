@@ -14,14 +14,11 @@
           <div class="p-3">
             {% if player.img %}
               {% if player.img.startswith('http') %}
-                {# กรณีเก็บเป็น Link URL #}
                 <img src="{{ player.img }}" alt="{{ player.name }}" class="img-fluid rounded shadow-sm">
               {% else %}
-                {# กรณีเก็บเป็นชื่อไฟล์ในโฟลเดอร์ static/images/ #}
                 <img src="{{ url_for('static', filename='images/' + player.img) }}" alt="{{ player.name }}" class="img-fluid rounded shadow-sm">
               {% endif %}
             {% else %}
-              {# กรณีไม่มีข้อมูลรูปภาพเลย #}
               <img src="{{ url_for('static', filename='images/default-player.png') }}" alt="Default Photo" class="img-fluid rounded shadow-sm">
             {% endif %}
           </div>
@@ -52,6 +49,12 @@
             <div class="row">
               <div class="col"><h3>Goals</h3></div>
               <div class="col"><h3 class="text-secondary float-end">{{ player.goals }}</h3></div>
+            </div>
+            <hr>
+
+            <div class="row">
+              <div class="col"><h3>Clean Sheets</h3></div>
+              <div class="col"><h3 class="text-secondary float-end">{{ player.clean_sheets }}</h3></div>
             </div>
             <hr>
             
